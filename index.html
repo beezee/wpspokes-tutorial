@@ -71,7 +71,95 @@
         inside WordPress using the WPSpokes framework, with help from the
         <a href="#">framework docs]</a>.
       </p>
-      <div class="diff" data-sha="38175295c81754bee26692d6f032a9bb6c327371"></div>
+
+      <h4>Main Plugin File</h4>
+      <p>
+        Every Wordpress plugin needs a main plugin file. This is where we will put the 
+        <a href="https://codex.wordpress.org/File_Header">plugin headers</a> that allow
+        WordPress to recognize it as a plugin. 
+        For plugins running on WPSpokes, it needs to do two other things:
+        <ol>
+          <li>Register with the WPSpokes autoloader</li>
+          <li>Define routes that the plugin will handle</li>
+        </ol>
+      </p>
+
+      <div class="diff" data-sha="8b6c29bd386600334377a3c9ddb743c5450e2a08"></div>
+      <p>
+        Let's inspect a few things that are happening above.
+      </p>
+
+      <h4>Registering with the autoloader</h4>
+      <p>
+        On line #20, in the static initialize method, we register a namespace with the WPSpokes autoloader.
+        The WPSpokes framework exposes itself as a singleton available via the static "instance" method, 
+        which gives us the register_namespace method. 
+      </p>
+      <p>
+        Note that the path passed as the second argument here must contain a directory 
+        whose name matches the the namespace defined by the first argument. 
+        In this case, we are telling the autoloader to map the WPAPI namespace 
+        to the WPAPI directory inside our plugin folder. 
+        This is the directory where we will put the rest of our code.
+      </p>
+
+      <h4>Defining routes that our plugin will handle</h4>
+      <p>
+        For now we are only defining one route, "/api/posts". We'll get this route to 
+        return a JSON blob containing an array of posts, and then move from there to add
+        more.
+      </p>
+      <p>
+        On line #15, in the add_routes method, we access the 
+        <a href="https://github.com/beezee/PHP-Router">WPSpokes router</a>, 
+        then call the map method to define our route, and the controller that will handle it.
+      </p>
+      <p>
+        Here we are saying that when someone accesses the "/api/posts" url, it should invoke the index
+        method of the PostsController class which lives in the WPAPI/Controllers directory and namespace.
+        We'll define this class and method next.
+      </p>
+
+      <div class="diff" data-sha="52ee70f505555e639ca6c0d62b4e64d075301b28"></div>
+
+      <p>
+        Again, looking at the code above we can see a few things happening.
+      </p>
+
+      <h4>Controller declaration</h4>
+      <p>
+        While not specific to controllers, it's worth mentioning the namespacing here. 
+        WPSpokes uses a <a href="http://www.php-fig.org/psr/psr-0/">PSR-0</a> based 
+        autoloader, so all classes in the plugin should use PSR-0 compliant namespacing.
+      </p>
+      <p>
+        In this case, we are starting from the WPAPI namespace we registered in the main plugin file,
+        and moving into the controllers directory, so the namespace is WPAPI\Controllers.
+      </p>
+      <p>
+        All controllers must inherit from \WPSpokes\Framework\Controller. The \WPSpokes\Framework
+        namespace contains all framework specific code.
+      </p>
+      
+      <h4>\WPSpokes\Framework\Controller::before()</h4>
+      <p>
+        On line #7, we declare a before method. This is not required, but be defining it, any code within
+        it will be run before a controller method is invoked by the WPSpokes router. The same is true for
+        a declared "after" method, which is run after the method invoked by the WPSpokes router.
+      </p>
+      <p>
+        In this case, we use the before method to set the Content-Type header, so that any methods we
+        use as route handlers in this controller will respond with JSON.
+      </p>
+
+      <h4>Model retrieval and serialization</h4>
+      <p>
+        WPSpokes uses <a href="http://laravel.com/docs/eloquent">Eloquent ORM</a> as the basis for the 
+        model layer, and provides models for the 
+        <a href="https://github.com/beezee/WPSpokes/tree/master/WPSpokes/Framework/Models">
+          basic WordPress datatypes
+        </a> in the \WPSpokes\Framework\Models namespace.
+      </p>
     </div>
     <div class="col-md-3">&nbsp;</div>
   </div>
@@ -79,7 +167,7 @@
     (function($){
       
       var showDiff = function(el){
-        $.get('https://cors-anywhere.herokuapp.com/https://github.com/beezee/WPSpokes/commit/' + el.data('sha'), 
+        $.get('https://cors-anywhere.herokuapp.com/https://github.com/beezee/wp-restful-api/commit/' + el.data('sha'), 
           function(data){
             diffView=$(data).find('div.diff-view#files');
             el.append(diffView);
