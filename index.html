@@ -43,7 +43,12 @@
     }
     .info {
       font-style: italic;
-      border-bottom: 1px solid gray;
+      text-decoration: underline;
+      margin-top: 12px;
+      margin-bottom: 4px;
+    }
+    .diff {
+      margin-bottom: 12px;
     }
   </style>
 </head>
@@ -69,7 +74,36 @@
       <p>
         By the end of this walkthrough, you will have a running start building scalable web applications
         inside WordPress using the WPSpokes framework, with help from the
-        <a href="#">framework docs]</a>.
+        <a href="#">framework docs</a>.
+      </p>
+
+      <h4>Scope of the Project</h4>
+      <p>
+        Once finished, our final product will offer the following functionality:
+        <ul>
+          <li>Restful resources for the following WordPress data types</li>
+            <ul>
+              <li>Posts</li>
+              <li>Users</li>
+              <li>Categories</li>
+              <li>Tags</li>
+            </ul>
+          </li>
+          <li>The following url structure for each restful resource</li>
+            <ul>
+              <li>POST to /api/{{data type}} to create new</li>
+              <li>GET to /api/{{data type}} to retrieve a list of instances</li>
+              <li>PUT to /api/{{data type}}/:id to update an instance</li>
+              <li>GET to /api/{{data type}}/:id to retrieve an instance</li>
+              <li>DELETE to /api/{{data type}}/:id to delete an instance</li>
+            </ul>
+          </li>
+          <li>All API endpoints will respond with JSON</li>
+          <li>We will secure access to the API based on current logged-in user</li>
+        </ul>
+        With that sketched out, let's get started. If you haven't yet, install and activate
+        the <a href="https://github.com/beezee/WPSpokes">WPSpokes</a> plugin on your WordPress
+        development installation.
       </p>
 
       <h4>Main Plugin File</h4>
@@ -79,7 +113,7 @@
         WordPress to recognize it as a plugin. 
         For plugins running on WPSpokes, it needs to do two other things:
         <ol>
-          <li>Register with the WPSpokes autoloader</li>
+          <li>Register a namespace with the WPSpokes autoloader</li>
           <li>Define routes that the plugin will handle</li>
         </ol>
       </p>
@@ -160,6 +194,119 @@
           basic WordPress datatypes
         </a> in the \WPSpokes\Framework\Models namespace.
       </p>
+      <p>
+        On lines #14-15, we are retrieving all posts in the database, (post_type filtering is handled by
+        the \WPSpokes\Framework\Models\Post model,) then outputting serialized JSON representing
+        that data set.
+      </p>
+      <p>
+        At this point if you've activated the WPSpokes plugin and your new plugin, you should be
+        able to navigate your web browser to your Wordpress instance, then visit the "/api/posts" path
+        and see a JSON blob representing an array of all of your posts. If you have alot this can be 
+        a slow page to load, so next we will add the ability to do some basic filtering at this endpoint.
+      </p>
+
+      <div class="diff" data-sha="3d97fe5fb50d4bd9d525ccc8715ccd12851983dc"></div>
+
+      <p>
+        It's not a huge gain, but we now have the ability to filter based on any attribute values.
+        This is useful for several simple groupings, such as showing only draft posts (/api/posts?post_status=draft)
+        or showing posts by a specific author (/api/posts?post_author=1). Combinations are possible too, 
+        like all drafts by a specific author (/api/posts?post_status=draft&post_author=1).
+      </p>
+      <p>
+        All we've changed to make this possible is to use
+        <a href="http://laravel.com/docs/eloquent#basic-usage">Eloquent's query builder</a>
+        to loop over any querystring parameters and add query conditions based on them. Thanks
+        to Eloquent we don't need to worry about escaping input before sending it to the
+        database.
+      </p>
+      <p>
+        With that in good shape, let's add the index endpoint for the rest of our data types.
+        Because the code for each will look extremely similar, we'll want to do some refactoring
+        along the way to avoid creating duplicate code.
+      </p>
+
+      <div class="diff" data-sha="c102fa4d27fbdac911aef9a688dddd56bbba5515"></div>
+
+      <p>
+        What we've done here is move most of the work that our PostsController was doing to 
+        an abstract \WPAPI\Controllers\APIController class. We've left one method abstract in 
+        that class, the "get_model_class" method, which requires any class inheriting from
+        the APIController to implement it.
+      </p>
+      <p>
+        This allows us to inherit from the APIController for all of our different data types, and 
+        simply define which model to use for the controller, eliminating any wasteful duplication.
+      </p>
+
+      <h4>Dynamic Getters/Setters</h4>
+      <p>
+        One noteworthy detail of the APIController is its use of a dynamic getter. Notice on line
+        #16 of the APIController, a reference to "model_class" as an attribute of the controller instance.
+        This is a feature of most objects that inherit from a WPSpokes class, which allows  methods prefixed
+        with "get_" or "set_" to be referenced as object properties.
+      </p>
+      <p>
+        With this refactoring in place it becomes trivial to add the index routes for the rest of our data types.
+        Let's do that now.
+      </p>
+
+      <div class="diff" data-sha="0da047c8c8da98d281bf4fc916d4b2041ba709ef"></div>
+
+      <p>
+        Following in the pattern of the PostsController, all we have to do is create a controller for each 
+        data type, return the correct model class from each controllers "get_model_class" method, and 
+        add the routes in the main plugin file.
+      </p>
+      <p>
+        By now you should be able to visit any of the following URLs and see a json representation of the 
+        appropriate data:
+        <ul>
+          <li>/api/posts</li>
+          <li>/api/users</li>
+          <li>/api/tags</li>
+          <li>/api/categories</li>
+        </ul>
+        At this stage the next thing to do is implement another of our restful endpoints, but first let's
+        refactor our route declarations, since they are starting to get long and redundant.
+      </p>
+
+      <div class="diff" data-sha="f02dec0f6248366858890c977b91840d5061ba95"></div>
+      <p>
+        By moving the route declarations to a parameterized method, we only have to declare each
+        endpoint of a resource once, instead of once per data type. By the time we are done, that
+        will save us 15 route declarations.
+      </p>
+      <p>
+        The next endpoint we will implement is the "show" endpoint, which displays info for a single 
+        instance of any data type. Thanks to our refactoring, we only need to add one route declaration
+        and one controller method to make this work across all data types.
+      </p>
+
+      <div class="diff" data-sha="db6fd754324a6868a1eb5c5bb145da1c9cd2ee2e"></div>
+      <p>
+        With the above code in place any of the previously listed urls can now be accessed with an ID 
+        added to the end to display a single instance. For example, /api/posts/1 will display the post
+        with a primary key of 1.
+      </p>
+      
+      <h4>Parameterized routes</h4>
+      <p>
+       Note on line #17 of the main plugin file, the ":id" token at the end of the declared route.
+       This corresponds to the $id parameter accepted by the show method defined on line #24 of the 
+       APIController. Parameters in route declarations are indicated by a preceding colon, and are
+       passed to the corresponding controller method as arguments in order of appearance in the 
+       route definition, from left to right.
+      </p>
+
+      <h4>404 Not Found</h4>
+      <p>
+        The \WPSpokes\Framework\Controller class includes a "set404" method, which sets a 404
+        header and displays the 404 page provided by your selected WordPress theme. Here we use it
+        when no instance is found with the provided primary key, on line #28 of the APIController.
+      </p>
+
     </div>
     <div class="col-md-3">&nbsp;</div>
   </div>
