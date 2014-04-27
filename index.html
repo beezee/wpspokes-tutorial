@@ -307,6 +307,37 @@
         when no instance is found with the provided primary key, on line #28 of the APIController.
       </p>
 
+      <p>
+        Next we will add the "create" endpoint, using the same approach as for the "show" 
+        endpoint, one route declaration and one controller method.
+      </p>
+
+      <div class="diff" data-sha="0dcf50fb9b19414f343b93a18d2826a9a8287408"></div>
+      <p>
+        With mostly more of the same, we now have a working create endpoint for each of our data types.
+        One thing to note on lines #17 and #22 of the main plugin file, we've added an extra parameter to the
+        call to the map method on the WPSpokes router, specifying which actions should be accepted for each
+        mapping.
+      </p>
+      <p>
+        This is necessary because the create and index endpoints share the same url, differing only in
+        request action.
+      </p>
+      <p>
+        Also note we used "create_new" as the method name on the controller. This is because the 
+        \WPSpokes\Framework\Controller class already inherits a create method for a different purpose.
+      </p>
+      <p>
+        We can now test creating models using curl at the terminal. Here's how I've tested with a category:
+        <pre>
+          curl -X POST http://local.wordpress.dev/api/categories/ -d '{"name":"A Brand New Category"}'
+          -> {
+              "taxonomy":"category","term_id":27,"term_taxonomy_id":25,
+              "name":"A Brand New Category","slug":"a-brand-new-category"
+             }
+        </pre>
+      </p>
+
     </div>
     <div class="col-md-3">&nbsp;</div>
   </div>
