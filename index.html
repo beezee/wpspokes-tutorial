@@ -330,7 +330,9 @@
       <p>
         We can now test creating models using curl at the terminal. Here's how I've tested with a category:
         <pre>
-          curl -X POST http://local.wordpress.dev/api/categories/ -d '{"name":"A Brand New Category"}'
+          curl -X POST http://local.wordpress.dev/api/categories/ \
+            -d '{"name":"A Brand New Category"}'
+
           -> {
               "taxonomy":"category","term_id":27,"term_taxonomy_id":25,
               "name":"A Brand New Category","slug":"a-brand-new-category"
