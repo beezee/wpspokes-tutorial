@@ -365,7 +365,80 @@
         people creating accounts using the API. In fact, when we come to securing the API towards the end of the
         tutorial, we'll restrict the user endpoints to admins only.
       </p>
+      <p>
+        Our last two updates are very similar, and should be familiar by now, so we'll knock them out in one
+        step, but first a small refactoring to prevent us from having to write the same code more than once.
+      </p>
 
+      <div class="diff" data-sha="9db71a8215b9e5499bd1a00f43c956b984546128"></div>
+      <p>
+        There are two things we accomplish here. First, we replace lines #26 to #29 of the APIController
+        with a call to our newly defined "find_or_404" method, which we will re-use in both of our remaining
+        endpoints.
+      </p>
+      <p>
+        Second, we replace lines #34 and #36 with a call to our newly defined "get_params" method. Note again 
+        that we are leveraging the WPSpokes provided virtual attribute behavior and referencing params as an
+        instance property in the "create_new" method.
+      </p>
+      <p>
+        With this in place, our last two endpoints are very concise.
+      </p>
+
+      <div class="diff" data-sha="d575c1bfc984a187bb8a3d00525241f3bd009d51"></div>
+      <p>
+        As promised, there's not a whole lot of code required at this point for our last two endpoints.
+        A few small things worth noting, we again add a third param to our previous "show" route
+        declaration to make room for our PUT and DELETE variations on the same url.
+      </p>
+      <p>
+        We use the Eloquent ORM provided "fill" method on line #55 of the APIController to massively assign
+        an array of attributes to an existing instance. This acheives the same result as passing parameters
+        to a model constructor, but in this case we are updating an existing record, so we don't directly
+        call the constructor in our code.
+      </p>
+      <p>
+        Here's how I tested these new endpoints (note the delete endpoint will actually destroy a row from 
+        your database.)
+      </p>
+
+      <pre>
+        curl -X POST http://local.wordpress.dev/api/categories/ \
+          -d '{"name":"A Category to Test"}'
+
+        -> {
+            "taxonomy":"category","term_id":30,"term_taxonomy_id":28,
+            "name":"A Category to Test","slug":"a-category-to-test"
+           }
+
+        curl http://local.wordpress.dev/api/categories/28/
+
+        -> {
+            "term_taxonomy_id":"28","term_id":"30","taxonomy":"category",
+            "description":"","parent":"0","count":"0",
+            "name":"A Category to Test","slug":"a-category-to-test"
+           }
+
+        curl -X PUT http://local.wordpress.dev/api/categories/28/ \
+          -d '{"description":"This is just for testing"}' 
+
+        -> {
+            "term_taxonomy_id":"28","term_id":"30","taxonomy":"category",
+            "description":"This is just for testing","parent":"0","count":"0",
+            "name":"A Category to Test","slug":"a-category-to-test"
+           }
+
+        curl -X DELETE http://local.wordpress.dev/api/categories/28/
+
+        -> {
+            "term_taxonomy_id":"28","term_id":"30","taxonomy":"category",
+            "description":"This is just for testing","parent":"0","count":"0",
+            "name":"A Category to Test","slug":"a-category-to-test"
+           }
+
+        curl http://local.wordpress.dev/api/categories/28/
+
+        -> 404
     </div>
     <div class="col-md-3">&nbsp;</div>
   </div>
