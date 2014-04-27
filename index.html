@@ -27,6 +27,7 @@
       padding: 1px;
       margin: 0px;
       border: 0px;
+      min-width: 550px;
     }
     .diff-line-num {
       font-size: 12px;
@@ -338,6 +339,31 @@
               "name":"A Brand New Category","slug":"a-brand-new-category"
              }
         </pre>
+      </p>
+      
+      <h4>Guarded Attributes</h4>
+      <p>
+        You may notice if you try to create a user that you get a user object with validation errors as a response.
+        This is because our create endpoint uses massive assignment to pass attributes in on object instantiation
+        (line #36 of APIController) and the \WPSpokes\Framework\Models\User model defines user_pass as a "guarded"
+        attribute. This means it cannot be massively assigned.
+      </p>
+      <pre>
+        curl -X POST http://local.wordpress.dev/api/users/ -d \
+          '{"user_login":"testuser", "user_pass":"test_pass",
+          "display_name":"Test User", "user_email":"test@test.com"}'
+
+        -> {
+            "user_login":"testuser","display_name":"Test User",
+            "user_email":"test@test.com","user_registered":"2014-04-27 04:37:41",
+            "user_nicename":"test-user",
+            "errors":{"user_pass":["User Pass is required"]}
+           }
+      </pre>
+      <p>
+        For this particular use case, it might be considered a desired behavior, since we probably don't want
+        people creating accounts using the API. In fact, when we come to securing the API towards the end of the
+        tutorial, we'll restrict the user endpoints to admins only.
       </p>
 
     </div>
