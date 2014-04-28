@@ -15,6 +15,8 @@
       <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
       <![endif]-->
   <script src="http://code.jquery.com/jquery.js"></script>
+  <script src="/jquery.stickyscroll.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/async/0.7.0/async.js"></script>
   <script src="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
   <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore-min.js"></script>
   <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.15/angular.min.js"></script>
@@ -22,6 +24,9 @@
   <style>
     p {
       margin-bottom: 18px;
+    }
+    .lead {
+      padding-left: 35px;
     }
     .file-diff pre {
       padding: 1px;
@@ -54,7 +59,7 @@
   </style>
 </head>
 <body>
-  <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+  <div class="navbar navbar-inverse" role="navigation">
     <div class="container-fluid">
       <div class="navbar-header">
         <a class="navbar-brand" href="#">WPSpokes Tutorial</a>
@@ -106,7 +111,12 @@
         the <a href="https://github.com/beezee/WPSpokes">WPSpokes</a> plugin on your WordPress
         development installation.
       </p>
-
+    </div>
+    <div class="col-md-3">&nbsp;</div>
+  </div>
+  <div class="row lead">
+    <hr />
+    <div class="col-md-5">
       <h4>Main Plugin File</h4>
       <p>
         Every Wordpress plugin needs a main plugin file. This is where we will put the 
@@ -117,11 +127,6 @@
           <li>Register a namespace with the WPSpokes autoloader</li>
           <li>Define routes that the plugin will handle</li>
         </ol>
-      </p>
-
-      <div class="diff" data-sha="8b6c29bd386600334377a3c9ddb743c5450e2a08"></div>
-      <p>
-        Let's inspect a few things that are happening above.
       </p>
 
       <h4>Registering with the autoloader</h4>
@@ -154,13 +159,14 @@
         method of the PostsController class which lives in the WPAPI/Controllers directory and namespace.
         We'll define this class and method next.
       </p>
-
-      <div class="diff" data-sha="52ee70f505555e639ca6c0d62b4e64d075301b28"></div>
-
-      <p>
-        Again, looking at the code above we can see a few things happening.
-      </p>
-
+    </div>
+    <div class="col-md-7">
+      <div class="diff" data-sha="8b6c29bd386600334377a3c9ddb743c5450e2a08"></div>
+    </div>
+  </div>
+  <div class="row lead">
+    <hr />
+    <div class="col-md-5">
       <h4>Controller declaration</h4>
       <p>
         While not specific to controllers, it's worth mentioning the namespacing here. 
@@ -206,17 +212,22 @@
         and see a JSON blob representing an array of all of your posts. If you have alot this can be 
         a slow page to load, so next we will add the ability to do some basic filtering at this endpoint.
       </p>
-
-      <div class="diff" data-sha="3d97fe5fb50d4bd9d525ccc8715ccd12851983dc"></div>
-
+    </div>
+    <div class="col-md-7">
+      <div class="diff" data-sha="52ee70f505555e639ca6c0d62b4e64d075301b28"></div>
+    </div>
+  </div>
+  <hr />
+  <div class="row lead">
+    <div class="col-md-5">
       <p>
-        It's not a huge gain, but we now have the ability to filter based on any attribute values.
+        With this small addition we now have the ability to filter based on any attribute values.
         This is useful for several simple groupings, such as showing only draft posts (/api/posts?post_status=draft)
         or showing posts by a specific author (/api/posts?post_author=1). Combinations are possible too, 
         like all drafts by a specific author (/api/posts?post_status=draft&post_author=1).
       </p>
       <p>
-        All we've changed to make this possible is to use
+        All we've added to make this possible is to use
         <a href="http://laravel.com/docs/eloquent#basic-usage">Eloquent's query builder</a>
         to loop over any querystring parameters and add query conditions based on them. Thanks
         to Eloquent we don't need to worry about escaping input before sending it to the
@@ -227,11 +238,16 @@
         Because the code for each will look extremely similar, we'll want to do some refactoring
         along the way to avoid creating duplicate code.
       </p>
-
-      <div class="diff" data-sha="c102fa4d27fbdac911aef9a688dddd56bbba5515"></div>
-
+    </div>
+    <div class="col-md-7">
+      <div class="diff" data-sha="3d97fe5fb50d4bd9d525ccc8715ccd12851983dc"></div>
+    </div>
+  </div>
+  <hr />
+  <div class="row lead">
+    <div class="col-md-5">
       <p>
-        What we've done here is move most of the work that our PostsController was doing to 
+        What we are doing here is moving most of the work that our PostsController was doing to 
         an abstract \WPAPI\Controllers\APIController class. We've left one method abstract in 
         that class, the "get_model_class" method, which requires any class inheriting from
         the APIController to implement it.
@@ -250,11 +266,16 @@
       </p>
       <p>
         With this refactoring in place it becomes trivial to add the index routes for the rest of our data types.
-        Let's do that now.
+        We'll do that next.
       </p>
-
-      <div class="diff" data-sha="0da047c8c8da98d281bf4fc916d4b2041ba709ef"></div>
-
+    </div>
+    <div class="col-md-7">
+      <div class="diff" data-sha="c102fa4d27fbdac911aef9a688dddd56bbba5515"></div>
+    </div>
+  </div>
+  <hr />
+  <div class="row lead">
+    <div class="col-md-5">
       <p>
         Following in the pattern of the PostsController, all we have to do is create a controller for each 
         data type, return the correct model class from each controllers "get_model_class" method, and 
@@ -272,8 +293,14 @@
         At this stage the next thing to do is implement another of our restful endpoints, but first let's
         refactor our route declarations, since they are starting to get long and redundant.
       </p>
-
-      <div class="diff" data-sha="f02dec0f6248366858890c977b91840d5061ba95"></div>
+    </div>
+    <div class="col-md-7">
+      <div class="diff" data-sha="0da047c8c8da98d281bf4fc916d4b2041ba709ef"></div>
+    </div>
+  </div>
+  <hr />
+  <div class="row lead">
+    <div class="col-md-5">
       <p>
         By moving the route declarations to a parameterized method, we only have to declare each
         endpoint of a resource once, instead of once per data type. By the time we are done, that
@@ -284,8 +311,14 @@
         instance of any data type. Thanks to our refactoring, we only need to add one route declaration
         and one controller method to make this work across all data types.
       </p>
-
-      <div class="diff" data-sha="db6fd754324a6868a1eb5c5bb145da1c9cd2ee2e"></div>
+    </div>
+    <div class="col-md-7">
+      <div class="diff" data-sha="f02dec0f6248366858890c977b91840d5061ba95"></div>
+    </div>
+  </div>
+  <hr />
+  <div class="row lead">
+    <div class="col-md-5">
       <p>
         With the above code in place any of the previously listed urls can now be accessed with an ID 
         added to the end to display a single instance. For example, /api/posts/1 will display the post
@@ -312,8 +345,14 @@
         Next we will add the "create" endpoint, using the same approach as for the "show" 
         endpoint, one route declaration and one controller method.
       </p>
-
-      <div class="diff" data-sha="0dcf50fb9b19414f343b93a18d2826a9a8287408"></div>
+    </div>
+    <div class="col-md-7">
+      <div class="diff" data-sha="db6fd754324a6868a1eb5c5bb145da1c9cd2ee2e"></div>
+    </div>
+  </div>
+  <hr />
+  <div class="row lead">
+    <div class="col-md-5">
       <p>
         With mostly more of the same, we now have a working create endpoint for each of our data types.
         One thing to note on lines #17 and #22 of the main plugin file, we've added an extra parameter to the
@@ -369,8 +408,14 @@
         Our last two updates are very similar, and should be familiar by now, so we'll knock them out in one
         step, but first a small refactoring to prevent us from having to write the same code more than once.
       </p>
-
-      <div class="diff" data-sha="9db71a8215b9e5499bd1a00f43c956b984546128"></div>
+    </div>
+    <div class="col-md-7">
+      <div class="diff" data-sha="0dcf50fb9b19414f343b93a18d2826a9a8287408"></div>
+    </div>
+  </div>
+  <hr />
+  <div class="row lead">
+    <div class="col-md-5">
       <p>
         There are two things we accomplish here. First, we replace lines #26 to #29 of the APIController
         with a call to our newly defined "find_or_404" method, which we will re-use in both of our remaining
@@ -384,8 +429,14 @@
       <p>
         With this in place, our last two endpoints are very concise.
       </p>
-
-      <div class="diff" data-sha="d575c1bfc984a187bb8a3d00525241f3bd009d51"></div>
+    </div>
+    <div class="col-md-7">
+      <div class="diff" data-sha="9db71a8215b9e5499bd1a00f43c956b984546128"></div>
+    </div>
+  </div>
+  <hr />
+  <div class="row lead">
+    <div class="col-md-5">
       <p>
         As promised, there's not a whole lot of code required at this point for our last two endpoints.
         A few small things worth noting, we again add a third param to our previous "show" route
@@ -402,59 +453,62 @@
         your database.)
       </p>
 
-      <pre>
-        curl -X POST http://local.wordpress.dev/api/categories/ \
-          -d '{"name":"A Category to Test"}'
+      <pre>curl -X POST http://local.wordpress.dev/api/categories/ \
+  -d '{"name":"A Category to Test"}'
 
-        -> {
-            "taxonomy":"category","term_id":30,"term_taxonomy_id":28,
-            "name":"A Category to Test","slug":"a-category-to-test"
-           }
+-> {
+    "taxonomy":"category","term_id":30,"term_taxonomy_id":28,
+    "name":"A Category to Test","slug":"a-category-to-test"
+   }
 
-        curl http://local.wordpress.dev/api/categories/28/
+curl http://local.wordpress.dev/api/categories/28/
 
-        -> {
-            "term_taxonomy_id":"28","term_id":"30","taxonomy":"category",
-            "description":"","parent":"0","count":"0",
-            "name":"A Category to Test","slug":"a-category-to-test"
-           }
+-> {
+    "term_taxonomy_id":"28","term_id":"30","taxonomy":"category",
+    "description":"","parent":"0","count":"0",
+    "name":"A Category to Test","slug":"a-category-to-test"
+   }
 
-        curl -X PUT http://local.wordpress.dev/api/categories/28/ \
-          -d '{"description":"This is just for testing"}' 
+curl -X PUT http://local.wordpress.dev/api/categories/28/ \
+  -d '{"description":"This is just for testing"}' 
 
-        -> {
-            "term_taxonomy_id":"28","term_id":"30","taxonomy":"category",
-            "description":"This is just for testing","parent":"0","count":"0",
-            "name":"A Category to Test","slug":"a-category-to-test"
-           }
+-> {
+    "term_taxonomy_id":"28","term_id":"30","taxonomy":"category",
+    "description":"This is just for testing","parent":"0","count":"0",
+    "name":"A Category to Test","slug":"a-category-to-test"
+   }
 
-        curl -X DELETE http://local.wordpress.dev/api/categories/28/
+curl -X DELETE http://local.wordpress.dev/api/categories/28/
 
-        -> {
-            "term_taxonomy_id":"28","term_id":"30","taxonomy":"category",
-            "description":"This is just for testing","parent":"0","count":"0",
-            "name":"A Category to Test","slug":"a-category-to-test"
-           }
+-> {
+    "term_taxonomy_id":"28","term_id":"30","taxonomy":"category",
+    "description":"This is just for testing","parent":"0","count":"0",
+    "name":"A Category to Test","slug":"a-category-to-test"
+   }
 
-        curl http://local.wordpress.dev/api/categories/28/
+curl http://local.wordpress.dev/api/categories/28/
 
-        -> 404
+-> 404
     </div>
-    <div class="col-md-3">&nbsp;</div>
+    <div class="col-md-7">
+      <div class="diff" data-sha="d575c1bfc984a187bb8a3d00525241f3bd009d51"></div>
+    </div>
   </div>
   <script>
     (function($){
       
-      var showDiff = function(el){
-        $.get('https://cors-anywhere.herokuapp.com/https://github.com/beezee/wp-restful-api/commit/' + el.data('sha'), 
+      var showDiff = function(el, cb){
+        $.get('https://cors-anywhere.herokuapp.com/https://github.com/beezee/wp-restful-api/commit/' + $(el).data('sha'), 
           function(data){
             diffView=$(data).find('div.diff-view#files');
-            el.append(diffView);
+            $(el).append(diffView);
+            cb();
         });
       };
 
-      $('.diff').each(function() {
-        showDiff($(this));
+      async.each($('.diff'), showDiff, function(err) {
+        if (err) console.log(err);
+        $('.diff').each(function() { $(this).stickyScroll({container: $(this).closest('.row')}); });
       });
 
     })(jQuery);
