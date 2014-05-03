@@ -85,7 +85,15 @@
 
       <h4>Scope of the Project</h4>
       <p>
-        Once finished, our final product will offer the following functionality:
+        The tutorial is broken up into two parts, each of which will produce a
+        related set of functionality, and expose you to related parts of the framework.
+      </p>
+      <p>
+        In part 1, you will become familiar with bootstrapping a WPSpokes-based plugin,
+        utilizing the WPSpokes router, and controllers to add urls to your WordPress site
+        whose behavior you control using a standard MVC approach. At the end of part 1,
+        your plugin will include the following features:
+
         <ul>
           <li>Restful resources for the following WordPress data types</li>
             <ul>
@@ -105,14 +113,36 @@
             </ul>
           </li>
           <li>All API endpoints will respond with JSON</li>
-          <li>We will secure access to the API based on current logged-in user</li>
         </ul>
-        With that sketched out, let's get started. If you haven't yet, install and activate
+      </p>
+
+      <p>
+        In part 2, you will become familiar with WPSpokes view handling, including the 
+        excellent <a href="https://github.com/Anahkiasen/former">former</a> library included
+        with WPSpokes for handling forms based on Eloquent models, as well as creating database
+        migrations with <a href="https://github.com/beezee/wp-phinx">WP Phinx</a> and Eloquent
+        models based on new tables.
+
+        After completing this part of the tutorial, your plugin will include the following
+        features:
+
+        <ul>
+          <li>A per-user interface for retrieving/resetting an API key and secret</li>
+          <li>An endpoint for creating temporary access tokens using 
+            an API key and signature based on secret</li>
+          <li>Secured access to the API based on the currently logged-in user,
+            or a provided access token and the associated user account</li>
+        </ul>
+
+        With that outlined, let's get started. If you haven't yet, install and activate
         the <a href="https://github.com/beezee/WPSpokes">WPSpokes</a> plugin on your WordPress
         development installation.
       </p>
     </div>
     <div class="col-md-3">&nbsp;</div>
+  </div>
+  <div class="row">
+    <h3 class="text-center">Part 1</h3>
   </div>
   <div class="row lead">
     <hr />
@@ -494,6 +524,10 @@ curl http://local.wordpress.dev/api/categories/28/
       <div class="diff" data-sha="d575c1bfc984a187bb8a3d00525241f3bd009d51"></div>
     </div>
   </div>
+  <div class="row">
+    <h3 class="text-center">Part 2</h3>
+  </div>
+  <hr />
   <script>
     (function($){
       
