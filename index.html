@@ -214,7 +214,7 @@
       
       <h4>\WPSpokes\Framework\Controller::before()</h4>
       <p>
-        On line #7, we declare a before method. This is not required, but be defining it, any code within
+        On line #7, we declare a before method. This is not required, but by defining it, any code within
         it will be run before a controller method is invoked by the WPSpokes router. The same is true for
         a declared "after" method, which is run after the method invoked by the WPSpokes router.
       </p>
@@ -528,6 +528,108 @@ curl http://local.wordpress.dev/api/categories/28/
     <h3 class="text-center">Part 2</h3>
   </div>
   <hr />
+  <div class="row lead">
+    <div class="col-md-5">
+      <h4>Setting up Phinx</h4>
+
+      <p>
+        Before we can create models or an interface for our API keys and tokens, we
+        need some new database tables. If you haven't already, install the
+        <a href="https://github.com/beezee/wp-phinx">WP Phinx</a> plugin and symlink
+        the phinx executable to your path (explained in the WP Phinx readme).
+      </p>
+  
+      <p>
+        Then, in the root directory for your api plugin, run the following:
+
+        <pre>
+          mkdir migrations && phinx init
+        </pre>
+      </p>
+
+      <p>
+        This adds a generic phinx.yml file inheriting db config from WordPress, so we can 
+        use phinx from the root of our plugin.
+      </p>
+
+      <p>
+        If everything is set up correctly, you should be able to run "phinx status" in the root of
+        your plugin and see the following output:
+
+        <pre>
+          There are no available migrations. Try creating one using the create command.
+        </pre>
+      </p>
+    </div>
+    <div class="col-md-5">
+      <div class="diff" data-sha="a209999ddfcd5f6ed01b9d2345ce0045b223d587"></div>
+    </div>
+  </div>
+  <hr />
+  <div class="row lead">
+    <div class="col-md-5">
+      <h4>Migrations</h4>
+
+      <p>
+        For our API authentication, we want users to have an API key and secret, which they can use
+        to generate access tokens. We'll add two new tables for this: api_keys, and access_tokens.
+      </p>
+
+      <p>
+        Each row in api_keys will need a reference to a user id, a key, and a secret, while each row
+        in access_tokens will need a reference to an api key id, a token, and an expiration date.
+      </p>
+
+      <p>
+        We'll include a created_at and updated_at column on both tables for good measure.
+      </p>
+
+      <p>
+        As suggested by the output from "phinx status" above, let's use the "phinx create" command to 
+        create our new migrations.
+
+        <pre>
+          phinx create CreateApiKeys
+          phinx create CreateAccessTokens
+        </pre>
+      <p>
+
+      <p>
+        Look in your migrations folder after running the above two commands, and you'll see two new files,
+        prefixed with timestamps and suffixed with snake-cased versions of the camel-cased names you passed
+        to each create command.
+      </p>
+
+      <p>
+        Edit each migration to look like the migrations here. For more details on phinx migrations, 
+        see the very thorough documentation <a href="http://docs.phinx.org/en/latest/intro.html">here</a>.
+      </p>
+
+      <p>
+        Once done, you can run the following in the root of your plugin to create the new tables:
+
+        <pre>
+          phinx migrate
+        </pre>
+      </p>
+    </div>
+    <div class="col-md-7">
+      <div class="diff" data-sha="af2e93e8d165e30e8346752c3fc66a2a3628d56e"></div>
+    </div>
+  </div>
+  <hr />
+  <div class="row lead">
+    <div class="col-md-5">
+      <h4>Models</h4>
+
+      In order to interact with our new tables, we'll need models for them. First we'll create the 
+      ApiKey model. Be sure to add a models folder to the WPAPI directory in your plugin, and place
+      all models there.
+    </div>
+    <div class="col-md-7">
+
+    </div>
+  </div>
   <script>
     (function($){
       
